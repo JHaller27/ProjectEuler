@@ -74,14 +74,16 @@ def get_min_path(start_row: int) -> int:
 
     return min(map(lambda s: s.get_sum(), solutions))
 
+
 init = []
 with open('matrix.txt', 'r') as fin:
     for line in fin:
         init.append(list(map(int, line.split(','))))
 
-min_paths = []
-with Pool(len(init)) as pool:
-    min_path = pool.map(get_min_path, range(len(init)))
-    min_paths.append(min_path)
+if __name__ == '__main__':
+    min_paths = []
+    with Pool(4) as pool:
+        min_path = pool.map(get_min_path, range(len(init)))
+        min_paths.append(min_path)
 
-print(min(min_paths))
+    print(min(min_paths))

@@ -1,4 +1,5 @@
 from utils.backtracker import *
+from multiprocessing import Pool
 
 
 class Matrix(Configuration):
@@ -64,18 +65,23 @@ class Matrix(Configuration):
         return self._col == self._col_count - 1
 
 
+def get_min_path(start_row: int) -> int:
+    global init
+
+    backtracker = Backtracker()
+    matrix = Matrix(init, start_row, 0)
+    solutions = backtracker.run(matrix, Backtracker.DFS, goal_halts=False)
+
+    return min(map(lambda s: s.get_sum(), solutions))
+
 init = []
 with open('matrix.txt', 'r') as fin:
     for line in fin:
         init.append(list(map(int, line.split(','))))
 
-print(init)
-exit()
+min_paths = []
+with Pool(len(init)) as pool:
+    min_path = pool.map(get_min_path, range(len(init)))
+    min_paths.append(min_path)
 
-backtracker = Backtracker()
-for ridx in range(len(init)):
-    matrix = Matrix(init, ridx, 0)
-
-    solutions = backtracker.run(matrix, Backtracker.DFS, goal_halts=False)
-
-    print(min(map(lambda s: s.get_sum(), solutions)))
+print(min(min_paths))

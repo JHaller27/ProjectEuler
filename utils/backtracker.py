@@ -16,7 +16,7 @@ class Backtracker:
     BFS = Queue
     DFS = Stack
 
-    def run(self, init_config: Configuration, search_coll: Collection, *, goal_halts = True) -> tuple:
+    def run(self, init_config: Configuration, search_coll: Collection, *, goal_halts = True, debug = False) -> tuple:
         if type(search_coll) == type:
             search_coll = search_coll()
 
@@ -29,10 +29,13 @@ class Backtracker:
             if not config.is_valid():
                 continue
 
+            if debug:
+                print(config)
+
             if config.is_goal():
                 goals.append(config)
                 if goal_halts:
-                    return tuple(goal_halts)
+                    return tuple(goals)
             else:
                 search_coll.push_many(config.get_children())
 

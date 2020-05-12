@@ -90,11 +90,12 @@ class memoize(_DecoratorDecorator):
         return result
 
 
-@memoize(track)
-def foo(x, y):
-    return x + y
+if __name__ == '__main__':
+    @memoize(track)
+    def foo(x, y):
+        return x + y
 
-for _ in range(500000):
-    foo(3, 5)
+    for _ in range(500000):
+        foo(3, 5)
 
-print(len(track['foo']))
+    print(len(track['foo']))

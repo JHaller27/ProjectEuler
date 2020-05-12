@@ -1,4 +1,4 @@
-from decorators import *
+from utils.decorators import *
 
 
 @memoize

@@ -4,10 +4,14 @@ class Node:
     def matches_goal(self, goal) -> bool:
         raise NotImplementedError
 
+    # h is the heuristic function. h() estimates the cost to reach goal from this node.
+    def h(self) -> int:
+        raise NotImplementedError
+
     def get_neighbors(self):
         raise NotImplementedError
 
-    def dist_to(self, other: 'Node'):
+    def dist_to(self, other: 'Node') -> int:
         raise NotImplementedError
 
 
@@ -20,9 +24,7 @@ def reconstruct_path(cameFrom, current):
 
 
 # A* finds a path from start to goal.
-# h is the heuristic function. h(n) estimates the cost to reach goal from node n.
-# d(current,neighbor) is the weight of the edge from current to neighbor
-def a_star(start: Node, goal, h):
+def a_star(start: Node, goal):
     # The set of discovered nodes that may need to be (re-)expanded.
     # Initially, only the start node is known.
     # This is usually implemented as a min-heap or priority queue rather than a hash-set.
@@ -39,7 +41,7 @@ def a_star(start: Node, goal, h):
     # For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
     # how short a path from start to finish can be if it goes through n.
     fScore = dict()
-    fScore[start] = h(start)
+    fScore[start] = start.h()
 
     while len(openSet) != 0:
         # This operation can occur in O(1) time if openSet is a min-heap or a priority queue
@@ -52,11 +54,11 @@ def a_star(start: Node, goal, h):
             # d(current,neighbor) is the weight of the edge from current to neighbor
             # tentative_gScore is the distance from start to the neighbor through current
             tentative_gScore = gScore[current] + current.dist_to(neighbor)
-            if tentative_gScore < gScore[neighbor]:
+            if neighbor not in gScore or tentative_gScore < gScore[neighbor]:
                 # This path to neighbor is better than any previous one. Record it!
                 cameFrom[neighbor] = current
                 gScore[neighbor] = tentative_gScore
-                fScore[neighbor] = gScore[neighbor] + h(neighbor)
+                fScore[neighbor] = gScore[neighbor] + neighbor.h()
                 if neighbor not in openSet:
                     openSet.add(neighbor)
 

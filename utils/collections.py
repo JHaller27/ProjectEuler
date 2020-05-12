@@ -8,11 +8,24 @@ class Collection:
     def __str__(self) -> str:
         return str(self._lst)
 
+    def __next__(self):
+        if len(self) == 0:
+            raise StopIteration()
+
+        return self.pop()
+
+    def __iter__(self):
+        return self.copy()
+
     def copy(self) -> 'Collection':
         return self.__class__(self._lst.copy())
 
     def clear(self):
         self._lst = []
+
+    def push_many(self, items):
+        for el in items:
+            self.push(el)
 
     def push(self, item):
         raise NotImplementedError('Method not implemented')
@@ -114,3 +127,15 @@ if __name__ == '__main__':
     assert len(q) > 0
     q.clear()
     expect('Queue:len after clear', len(q), 0)
+
+    # Queue iterator
+    q = Queue([1, 2, 3])
+
+    assert len(q) == 3
+
+    i = 1
+    for el in q:
+        expect('Queue:next', el, i)
+        i += 1
+
+    expect('Queue:len after iteratation', len(q), 3)

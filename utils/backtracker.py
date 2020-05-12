@@ -16,7 +16,7 @@ class Backtracker:
     BFS = Queue
     DFS = Stack
 
-    def run(self, init_config: Configuration, search_coll: Collection, *, goal_halts = True, debug = False) -> tuple:
+    def run(self, init_config: Configuration, search_coll: Collection, goal_halts = True, debug = False) -> tuple:
         if type(search_coll) == type:
             search_coll = search_coll()
 

@@ -67,4 +67,4 @@ if __name__ == '__main__':
     starts = get_starts(init)
 
     for start in starts:
-        a_star(start, None)
+        print(a_star(start, None))

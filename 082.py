@@ -1,78 +1,61 @@
-from utils.backtracker import *
+from utils.a_star import *
 from multiprocessing import Pool
 
 
-class Matrix(Configuration):
-    EAST = 0
-    NORTH = 1
-    SOUTH = 2
-
-    def __init__(self, init, row, col, _total = 0, _last = EAST):
+class MatrixCell(Node):
+    def __init__(self, pos: (int, int), val: int, size: (int, int)):
         super().__init__()
 
-        self._grid = init
-        self._row_count = len(self._grid)
-        self._col_count = len(self._grid[0])
+        self._pos = pos
+        self._val = val
+        self._neighbors = list()
+        self._num_rows = size[0]
+        self._num_cols = size[1]
 
-        self._row = row
-        self._col = col
-        self._total = _total + self._grid[self._row][self._col]
+    def __repr__(self) -> str:
+        return f'({self._pos[0]}, {self._pos[1]} -> {self._val})'
 
-        self._last = _last
+    def add_neighbor(self, neighbor):
+        self._neighbors.append(neighbor)
 
-    def __str__(self) -> str:
-        lines = []
+    def matches_goal(self, goal) -> bool:
+        return self._pos[1] == self._num_cols
 
-        for ridx, row in enumerate(self._grid):
-            cells = []
-            for cidx, val in enumerate(row):
-                fmt = '({})' if ridx == self._row and cidx == self._col else ' {} '
-                fmt = fmt.format('{:>3}')
-                cells.append(fmt.format(val))
-            lines.append(' '.join(cells))
+    # h is the heuristic function. h() estimates the cost to reach goal from this node.
+    def h(self) -> int:
+        return (self._num_cols - self._pos[0]) + (self._num_rows - self._pos[1])
 
-        width = max(map(lambda l: len(l), lines))
-        lines = ['-' * width] + lines + ['-' * width]
+    def get_neighbors(self):
+        return self._neighbors
 
-        return '\n'.join(lines)
-
-    def get_sum(self) -> int:
-        return self._total
-
-    def get_children(self) -> list:
-        children = []
-
-        child_pos_lst = []
-
-        child_pos_lst.append((self._row, self._col+1, Matrix.EAST))  # East
-        if self._last != Matrix.SOUTH:
-            child_pos_lst.append((self._row-1, self._col, Matrix.NORTH))  # North
-        if self._last != Matrix.NORTH:
-            child_pos_lst.append((self._row+1, self._col, Matrix.SOUTH))  # South
-
-        for pos in child_pos_lst:
-            row, col, last = pos
-            if 0 <= row < self._row_count and 0 <= col < self._col_count:
-                child = Matrix(self._grid, row, col, self._total, last)
-                children.append(child)
-
-        return children
-
-    def is_valid(self) -> bool:
-        return True
-
-    def is_goal(self) -> bool:
-        return self._col == self._col_count - 1
+    def dist_to(self, other: 'MatrixCell'):
+        return other._val
 
 
-def get_min_path(start_row: int) -> int:
-    global init
+def get_starts(init: list) -> list:
+    num_rows = len(init)
+    num_cols = len(init[0])
 
-    backtracker = Backtracker()
-    matrix = Matrix(init, start_row, 0)
-    solutions = backtracker.run(matrix, Backtracker.DFS, goal_halts=False)
+    # Convert primitives to Cells, but do not link yet
+    matrix = [[MatrixCell((ridx, cidx), val, (num_rows, num_cols)) for cidx, val in enumerate(row)] for ridx, row in enumerate(init)]
 
-    return min(map(lambda s: s.get_sum(), solutions))
+    # Link neighbors to Cells
+    for ridx, row in enumerate(matrix):
+        for cidx, cell in enumerate(row):
+            # North
+            if 0 <= ridx - 1:
+                matrix[ridx][cidx].add_neighbor(matrix[ridx - 1][cidx])
+
+            # East
+            if cidx + 1 < num_cols:
+                matrix[ridx][cidx].add_neighbor(matrix[ridx][cidx + 1])
+
+            # South
+            if ridx + 1 < num_rows:
+                matrix[ridx][cidx].add_neighbor(matrix[ridx + 1][cidx])
+
+    # Return first Cell in each row
+    return [row[0] for row in matrix]
 
 
 init = []
@@ -81,9 +64,7 @@ with open('matrix.txt', 'r') as fin:
         init.append(list(map(int, line.split(','))))
 
 if __name__ == '__main__':
-    min_paths = []
-    with Pool(4) as pool:
-        min_path = pool.map(get_min_path, range(len(init)))
-        min_paths.append(min_path)
+    starts = get_starts(init)
 
-    print(min(min_paths))
+    for start in starts:
+        a_star(start, None)

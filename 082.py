@@ -73,10 +73,15 @@ with open('matrix.txt', 'r') as fin:
 if __name__ == '__main__':
     starts = get_starts(init)
 
+    min_path = None
+    min_sum = None
     for start in starts:
         path = a_star(start, None)
         path_sum = sum(map(lambda mc: mc.get_val(), path))
 
-        print(path)
-        print(path_sum)
-        print()
+        if min_sum is None or path_sum < min_sum:
+            min_sum = path_sum
+            min_path = path
+
+    print(min_path)
+    print(min_sum)

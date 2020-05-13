@@ -2,9 +2,14 @@ from utils.collections import *
 
 # Credit: https://en.wikipedia.org/wiki/A*_search_algorithm#Pseudocode (accessed 12/5/2020)
 
+fScore = dict()
+
 class Node:
     def __lt__(self, other: 'Node') -> bool:
-        raise NotImplementedError
+        return fScore[self] - fScore[other] < 0
+
+    def __repr__(self) -> str:
+        return str(fScore[self]) if self in fScore else '???'
 
     def matches_goal(self, goal) -> bool:
         raise NotImplementedError
@@ -21,7 +26,7 @@ class Node:
 
 
 def reconstruct_path(cameFrom, current):
-    total_path = set([current])
+    total_path = [current]
     while current in cameFrom:
         current = cameFrom[current]
         total_path.insert(0, current)
@@ -41,20 +46,19 @@ def a_star(start: Node, goal):
 
     # For node n, gScore[n] is the cost of the cheapest path from start to n currently known.
     gScore = dict()
-    gScore[start] = 0
+    gScore[start] = start.dist_to(start)
 
     # For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
     # how short a path from start to finish can be if it goes through n.
-    fScore = dict()
+    global fScore
     fScore[start] = start.h()
 
     while len(openSet) != 0:
         # This operation can occur in O(1) time if openSet is a min-heap or a priority queue
-        current = min(openSet, key=lambda n: fScore[n])
+        current = openSet.pop()
         if current.matches_goal(goal):
             return reconstruct_path(cameFrom, current)
 
-        openSet.remove(current)
         for neighbor in current.get_neighbors():
             # d(current,neighbor) is the weight of the edge from current to neighbor
             # tentative_gScore is the distance from start to the neighbor through current

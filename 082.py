@@ -65,7 +65,7 @@ def get_starts(init: list) -> list:
 
 
 init = []
-with open('matrix.txt', 'r') as fin:
+with open('data/081.txt', 'r') as fin:
     for line in fin:
         init.append(list(map(int, line.split(','))))
 

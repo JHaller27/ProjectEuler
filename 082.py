@@ -1,5 +1,4 @@
 from utils.a_star import *
-from multiprocessing import Pool
 
 
 class MatrixCell(Node):
@@ -72,16 +71,16 @@ with open('matrix.txt', 'r') as fin:
 
 if __name__ == '__main__':
     starts = get_starts(init)
+    paths = map(a_star, starts)
 
     min_path = None
     min_sum = None
-    for start in starts:
-        path = a_star(start, None)
+    for path in paths:
         path_sum = sum(map(lambda mc: mc.get_val(), path))
 
         if min_sum is None or path_sum < min_sum:
             min_sum = path_sum
             min_path = path
 
-    print(min_path)
+    # print(min_path)
     print(min_sum)

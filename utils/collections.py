@@ -1,3 +1,5 @@
+import heapq
+
 class Collection:
     def __init__(self, init = None):
         self._lst = [] if init is None else init
@@ -57,6 +59,21 @@ class Queue(Collection):
 
     def peek(self, idx = None):
         return self._lst[0]
+
+
+class MinHeap(Collection):
+    def __init__(self, init = None):
+        heapq.heapify(init)
+        super().__init__(init)
+
+    def push(self, item):
+        heapq.heappush(self._lst, item)
+
+    def pop(self):
+        return heapq.heappop(self._lst)
+
+    def peek(self, idx = 0):
+        return self._lst[idx]
 
 
 if __name__ == '__main__':
@@ -139,3 +156,46 @@ if __name__ == '__main__':
         i += 1
 
     expect('Queue:len after iteratation', len(q), 3)
+
+    # Compare performance of list / heap
+    import time
+    import random
+
+    l = [i for i in range(10000)]
+    random.shuffle(l)
+
+    # list
+    times = 0
+    count = 0
+    for _ in range(10):
+        l1 = l.copy()
+        start = time.perf_counter()
+        llen = len(l)
+        for i in range(llen):
+            x = min(l1)
+            l1.remove(x)
+            assert x == i
+        end = time.perf_counter()
+        times += end - start
+        count += 1
+    avg_list_time = times / count
+
+    # heap
+    times = 0
+    count = 0
+    for _ in range(10):
+        l1 = MinHeap(l.copy())
+        start = time.perf_counter()
+        llen = len(l)
+        for i in range(llen):
+            x = l1.pop()
+            assert x == i
+        end = time.perf_counter()
+        times += end - start
+        count += 1
+    avg_heap_time = times / count
+
+    if avg_heap_time >= avg_list_time:
+        print('Expected min heap to be faster than flat lists')
+        print(f'\tHeap avg time: {avg_heap_time} sec')
+        print(f'\tList avg time: {avg_list_time} sec')

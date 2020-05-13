@@ -2,14 +2,18 @@ from utils.collections import *
 
 # Credit: https://en.wikipedia.org/wiki/A*_search_algorithm#Pseudocode (accessed 12/5/2020)
 
-fScore = dict()
-
 class Node:
+    def __init__(self):
+        self.fScore = None
+
     def __lt__(self, other: 'Node') -> bool:
-        return fScore[self] - fScore[other] < 0
+        return self.fScore[self] - self.fScore[other] < 0
 
     def __repr__(self) -> str:
-        return str(fScore[self]) if self in fScore else '???'
+        return str(self.fScore[self]) if self.fScore is not None and self in self.fScore else f'???'
+
+    def set_fScore(self, fScore):
+        self.fScore = fScore
 
     def matches_goal(self, goal) -> bool:
         raise NotImplementedError
@@ -33,12 +37,30 @@ def reconstruct_path(cameFrom, current):
     return total_path
 
 
+class AStarMinHeap(MinHeap):
+    def __init__(self, init, fScore):
+        super().__init__(init)
+
+        self._fScore = fScore
+
+    def copy(self) -> 'Collection':
+        return self.__class__(self._lst.copy(), self._fScore)
+
+    def push(self, item: Node):
+        item.set_fScore(self._fScore)
+        super().push(item)
+
 # A* finds a path from start to goal.
-def a_star(start: Node, goal):
+def a_star(start: Node, goal = None):
+    # For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
+    # how short a path from start to finish can be if it goes through n.
+    fScore = dict()
+    fScore[start] = start.h()
+
     # The set of discovered nodes that may need to be (re-)expanded.
     # Initially, only the start node is known.
     # This is usually implemented as a min-heap or priority queue rather than a hash-set.
-    openSet = MinHeap([start])
+    openSet = AStarMinHeap([start], fScore)
 
     # For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start
     # to n currently known.
@@ -47,11 +69,6 @@ def a_star(start: Node, goal):
     # For node n, gScore[n] is the cost of the cheapest path from start to n currently known.
     gScore = dict()
     gScore[start] = start.dist_to(start)
-
-    # For node n, fScore[n] := gScore[n] + h(n). fScore[n] represents our current best guess as to
-    # how short a path from start to finish can be if it goes through n.
-    global fScore
-    fScore[start] = start.h()
 
     while len(openSet) != 0:
         # This operation can occur in O(1) time if openSet is a min-heap or a priority queue

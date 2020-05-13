@@ -1,6 +1,11 @@
+from utils.collections import *
+
 # Credit: https://en.wikipedia.org/wiki/A*_search_algorithm#Pseudocode (accessed 12/5/2020)
 
 class Node:
+    def __lt__(self, other: 'Node') -> bool:
+        raise NotImplementedError
+
     def matches_goal(self, goal) -> bool:
         raise NotImplementedError
 
@@ -28,7 +33,7 @@ def a_star(start: Node, goal):
     # The set of discovered nodes that may need to be (re-)expanded.
     # Initially, only the start node is known.
     # This is usually implemented as a min-heap or priority queue rather than a hash-set.
-    openSet = set([start])
+    openSet = MinHeap([start])
 
     # For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start
     # to n currently known.
@@ -60,7 +65,7 @@ def a_star(start: Node, goal):
                 gScore[neighbor] = tentative_gScore
                 fScore[neighbor] = gScore[neighbor] + neighbor.h()
                 if neighbor not in openSet:
-                    openSet.add(neighbor)
+                    openSet.push(neighbor)
 
     # Open set is empty but goal was never reached
     return None

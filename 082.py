@@ -15,6 +15,9 @@ class MatrixCell(Node):
     def __repr__(self) -> str:
         return f'({self._pos[0]}, {self._pos[1]} -> {self._val})'
 
+    def __lt__(self, other: 'MatrixCell') -> bool:
+        return self._val < other._val
+
     def add_neighbor(self, neighbor):
         self._neighbors.append(neighbor)
 

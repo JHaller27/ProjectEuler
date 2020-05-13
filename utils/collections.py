@@ -75,6 +75,9 @@ class MinHeap(Collection):
     def peek(self, idx = 0):
         return self._lst[idx]
 
+    def remove(self, item):
+        self._lst.remove(item)
+
 
 if __name__ == '__main__':
     def expect(title: str, actual, expected):

@@ -31,14 +31,25 @@ class _DecoratorDecorator(_Decorator):
 
 
 class debug(_DecoratorDecorator):
+    def __init__(self, base: _Decorator = None, exclude = None):
+        super().__init__(base)
+
+        self._exclude = set() if exclude is None else set(exclude)
+
     def _call(self, *args, **kwargs):
-        print(f'DEBUG: name={self._func.__name__}')
-        print(f'DEBUG: {args=}')
-        print(f'DEBUG: {kwargs=}')
+        if 'name' not in self._exclude:
+            print(f'DEBUG: name={self._func.__name__}')
+
+        if 'args' not in self._exclude:
+            print(f'DEBUG: {args=}')
+
+        if 'kwargs' not in self._exclude:
+            print(f'DEBUG: {kwargs=}')
 
         result = super()._call(*args, **kwargs)
 
-        print(f'DEBUG: {result=}')
+        if 'result' not in self._exclude:
+            print(f'DEBUG: {result=}')
 
         return result
 

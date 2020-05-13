@@ -71,7 +71,14 @@ class Tracker(_DecoratorDecorator):
     def __iter__(self):
         return iter(self._calls)
 
-track = Tracker()
+tracker = None
+def track():
+    global tracker
+
+    if tracker is None:
+        tracker = Tracker()
+
+    return tracker
 
 
 class memoize(_DecoratorDecorator):
@@ -91,7 +98,7 @@ class memoize(_DecoratorDecorator):
 
 
 if __name__ == '__main__':
-    @memoize(track)
+    @memoize(track())
     def foo(x, y):
         return x + y
 

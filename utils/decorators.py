@@ -38,6 +38,9 @@ class debug(_DecoratorDecorator):
         self._sep = sep
 
     def _call(self, *args, **kwargs):
+        if self._sep is not None:
+            print(self._sep)
+
         if 'name' not in self._exclude:
             print(f'DEBUG: name={self._func.__name__}')
 
@@ -51,9 +54,6 @@ class debug(_DecoratorDecorator):
 
         if 'result' not in self._exclude:
             print(f'DEBUG: {result=}')
-
-        if self._sep is not None:
-            print(self._sep)
 
         return result
 

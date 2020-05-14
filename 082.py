@@ -1,86 +1,93 @@
-from utils.a_star import *
+import random
 
 
-class MatrixCell(Node):
-    def __init__(self, pos: (int, int), val: int, size: (int, int), avg_val: int):
-        super().__init__()
+class Grid:
+    def __init__(self, height: int, width: int):
+        self.height = height
+        self.width = width
 
-        self._pos = pos
-        self._val = val
-        self._neighbors = list()
-        self._num_rows = size[0]
-        self._num_cols = size[1]
+        self._grid = [[None] * width for _ in range(height)]
 
-        self._avg_val = avg_val
+    @classmethod
+    def from_table(cls, table):
+        grid = cls(len(table), len(table[0]))
+        for r, row in enumerate(table):
+            for c, val in enumerate(row):
+                grid[r, c] = val
+
+        return grid
 
     def __repr__(self) -> str:
-        return f'({self._pos[0]}, {self._pos[1]} -> {self._val} / {super().__repr__()})'
+        return '\n'.join([', '.join([val for val in row]) for row in self._grid])
 
-    def add_neighbor(self, neighbor):
-        self._neighbors.append(neighbor)
+    def __getitem__(self, c: (int, int)):
+        x, y = c
+        return self._grid[y][x]
 
-    def matches_goal(self, goal) -> bool:
-        return self._pos[1] == self._num_cols - 1
+    def __setitem__(self, c: (int, int), val: int):
+        x, y = c
+        self._grid[y][x] = val
 
-    # h is the heuristic function. h() estimates the cost to reach goal from this node.
-    def h(self) -> int:
-        return (self._num_cols - self._pos[1]) * self._avg_val
+    def copy(self) -> 'Grid':
+        """
+        Creates identical copy, including values
+        """
+        new_grid = Grid(self.height, self.width)
+        for r in self.height_range():
+            for c in self.width_range():
+                new_grid[r, c] = self[r, c]
 
-    def get_neighbors(self):
-        return self._neighbors
+        return new_grid
 
-    def dist_to(self, other: 'MatrixCell'):
-        return other._val
+    def clone(self) -> 'Grid':
+        """
+        Creates Grid of same size, without setting values
+        """
+        return Grid(self.height, self.width)
 
-    def get_val(self) -> int:
-        return self._val
+    def fill(self, val) -> None:
+        for r in self.height_range():
+            for c in self.width_range():
+                self[r, c] = val
 
+    def height_range(self) -> int:
+        return range(self.height)
 
-def get_starts(init: list) -> list:
-    num_rows = len(init)
-    num_cols = len(init[0])
-
-    avg_val = sum(sum(row) for row in init) // (num_rows * num_cols)
-
-    # Convert primitives to Cells, but do not link yet
-    matrix = [[MatrixCell((ridx, cidx), val, (num_rows, num_cols), avg_val) for cidx, val in enumerate(row)] for ridx, row in enumerate(init)]
-
-    # Link neighbors to Cells
-    for ridx, row in enumerate(matrix):
-        for cidx, cell in enumerate(row):
-            # North
-            if 0 <= ridx - 1:
-                matrix[ridx][cidx].add_neighbor(matrix[ridx - 1][cidx])
-
-            # East
-            if cidx + 1 < num_cols:
-                matrix[ridx][cidx].add_neighbor(matrix[ridx][cidx + 1])
-
-            # South
-            if ridx + 1 < num_rows:
-                matrix[ridx][cidx].add_neighbor(matrix[ridx + 1][cidx])
-
-    # Return first Cell in each row
-    return [row[0] for row in matrix]
+    def width_range(self) -> int:
+        return range(self.width)
 
 
-init = []
-with open('data/081.txt', 'r') as fin:
-    for line in fin:
-        init.append(list(map(int, line.split(','))))
+def file2grid(fname: str) -> Grid:
+    with open(fname, 'r') as fin:
+        table = [list(map(int, line.replace(' ', '').split(','))) for line in fin]
+
+    return Grid.from_table(table)
+
+
+def get_min_dist(grid: Grid, dist: Grid, r: int, c: int) -> int:
+    values = []
+
+    if r + 1 < grid.height:
+        values.append(grid[r, c] + dist[r + 1, c])
+
+    if c + 1 < grid.width:
+        values.append(grid[r, c] + dist[r, c + 1])
+
+    return grid[r, c] if len(values) == 0 else min(values)
+
+
+def compute_min_weight(grid: Grid):
+    dist = grid.clone()
+    dist.fill(0)
+
+    for ridx in reversed(grid.height_range()):
+        for cidx in reversed(grid.width_range()):
+            dist[ridx, cidx] = get_min_dist(grid, dist, ridx, cidx)
+
+    return dist[0, 0]
+
 
 if __name__ == '__main__':
-    starts = get_starts(init)
-    paths = map(a_star, starts)
+    grid = file2grid('data/081.txt')
 
-    min_path = None
-    min_sum = None
-    for path in paths:
-        path_sum = sum(map(lambda mc: mc.get_val(), path))
-
-        if min_sum is None or path_sum < min_sum:
-            min_sum = path_sum
-            min_path = path
-
-    # print(min_path)
-    print(min_sum)
+    print(compute_min_weight(grid))

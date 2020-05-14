@@ -66,7 +66,7 @@ def fill_score(group: int, *args) -> int:
     return result
 
 
-# @debug(exclude=['kwargs'])
+@debug(exclude=['kwargs'])
 def get_group_score(hand: list) -> int:
     hand = sorted(hand, key=lambda c: c[0])
 
@@ -160,5 +160,5 @@ def player1_wins(h: (list, list)) -> bool:
 
 
 if __name__ == '__main__':
-    p1_wins = list(filter(player1_wins, hands_from_file('data/054_example.txt')))
+    p1_wins = list(filter(player1_wins, hands_from_file('data/054.txt')))
     print(len(p1_wins))

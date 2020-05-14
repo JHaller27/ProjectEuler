@@ -45,11 +45,11 @@ def get_starts(init: list) -> list:
     # Convert primitives to Cells, but do not link yet
     matrix = [[MatrixCell((ridx, cidx), val, (num_rows, num_cols), avg_val) for cidx, val in enumerate(row)] for ridx, row in enumerate(init)]
 
-    # Link neighbors to Cells (first row should only allow moving East)
+    # Link neighbors to Cells
     for ridx, row in enumerate(matrix):
         for cidx, cell in enumerate(row):
             # North
-            if 0 <= ridx - 1 and cidx != 0:
+            if 0 <= ridx - 1:
                 matrix[ridx][cidx].add_neighbor(matrix[ridx - 1][cidx])
 
             # East
@@ -57,7 +57,7 @@ def get_starts(init: list) -> list:
                 matrix[ridx][cidx].add_neighbor(matrix[ridx][cidx + 1])
 
             # South
-            if ridx + 1 < num_rows and cidx != 0:
+            if ridx + 1 < num_rows:
                 matrix[ridx][cidx].add_neighbor(matrix[ridx + 1][cidx])
 
     # Return first Cell in each row

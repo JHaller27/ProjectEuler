@@ -62,21 +62,57 @@ class Queue(Collection):
 
 
 class MinHeap(Collection):
-    def __init__(self, init = None):
-        heapq.heapify(init)
+    class Node:
+        def __init__(self, val, lt_func):
+            self.val = val
+            self._lt_func = lt_func
+
+        def __repr__(self) -> str:
+            return self.val.__repr__()
+
+        def __lt__(self, other: 'Node') -> bool:
+            return self._lt_func(self.val, other.val)
+
+    def __init__(self, init = None, lt_func = None):
+        self._must_convert = lt_func is not None
+        self._lt_func = lt_func
+
+        if init is not None:
+            if self._must_convert:
+                init = list(map(self._convert, init))
+
+            heapq.heapify(init)
+
         super().__init__(init)
 
+    def _convert(self, item) -> Node:
+        return MinHeap.Node(item, self._lt_func)
+
     def push(self, item):
+        if self._must_convert:
+            item = self._convert(item)
         heapq.heappush(self._lst, item)
 
     def pop(self):
+        if self._must_convert:
+            return heapq.heappop(self._lst).val
+
         return heapq.heappop(self._lst)
 
     def peek(self, idx = 0):
+        if self._must_convert:
+            return self._lst[idx].val
+
         return self._lst[idx]
 
     def remove(self, item):
-        self._lst.remove(item)
+        if self._must_convert:
+            self._lst.remove(self._convert(item))
+        else:
+            self._lst.remove(item)
+
+    def reheap(self):
+        heapq.heapify(self._lst)
 
 
 if __name__ == '__main__':
@@ -159,6 +195,12 @@ if __name__ == '__main__':
         i += 1
 
     expect('Queue:len after iteratation', len(q), 3)
+
+    # Test MinHeap -> MaxHeap using lt_func
+    maxHeap = MinHeap([1, 2, 3], lambda l, r: l > r)
+    expect('Pop from MinHeap:lt_func (ie MaxHeap)', maxHeap.pop(), 3)
+    expect('Pop from MinHeap:lt_func (ie MaxHeap)', maxHeap.pop(), 2)
+    expect('Pop from MinHeap:lt_func (ie MaxHeap)', maxHeap.pop(), 1)
 
     # Compare performance of list / heap
     import time

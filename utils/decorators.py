@@ -31,10 +31,11 @@ class _DecoratorDecorator(_Decorator):
 
 
 class debug(_DecoratorDecorator):
-    def __init__(self, base: _Decorator = None, exclude = None):
+    def __init__(self, base: _Decorator = None, exclude = None, sep = ''):
         super().__init__(base)
 
         self._exclude = set() if exclude is None else set(exclude)
+        self._sep = sep
 
     def _call(self, *args, **kwargs):
         if 'name' not in self._exclude:
@@ -50,6 +51,9 @@ class debug(_DecoratorDecorator):
 
         if 'result' not in self._exclude:
             print(f'DEBUG: {result=}')
+
+        if self._sep is not None:
+            print(self._sep)
 
         return result
 

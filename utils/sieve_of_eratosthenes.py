@@ -8,7 +8,7 @@ def is_prime(num) -> bool:
     # Extend
     old_end = len(sieve)
     sieve.extend([True] * (num - len(sieve) + 1))
-    for p in range(2, old_end):
+    for p in range(2, int(len(sieve)**.5)+1):
         if sieve[p]:
             mult = 2
             while p * mult < len(sieve):
@@ -38,3 +38,4 @@ def prime_factors(num) -> list:
             return factor_list
 
     return factor_list
+

@@ -27,10 +27,10 @@ def primes(start: int = 2, end: int = None, count: int = None) -> int:
         start += 1
 
 
-def factors(num) -> list:
+def prime_factors(num) -> list:
     tmp = num
     factor_list = [1]
-    for p in primes(end=num**.5):
+    for p in primes(end=num**.5+1):
         while tmp % p == 0:
             factor_list.append(p)
             tmp //= p

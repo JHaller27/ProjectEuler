@@ -3,8 +3,7 @@ def read(fname: str) -> list:
         return [list(map(int, line.strip().split())) for line in fin]
 
 
-def main():
-    TREE = read('data/018.txt')
+def main(TREE):
     SUM_TREE = [[0] * (i+1) for i in range(len(TREE))]
     SUM_TREE[0][0] = TREE[0][0]
 
@@ -20,4 +19,4 @@ def main():
 
 
 if __name__ == '__main__':
-    print(main())
+    print(main(read('data/018.txt')))

@@ -17,9 +17,9 @@ def primes(start: int = None, end: int = None, count: int = None) -> int:
     assert count is None or count-start_idx <= len(PRIMES), f'count must not be greater than {len(PRIMES)}'
     assert end is None or end <= PRIMES[-1], f'end {end} out of range'
 
-    sliced_primes = PRIMES[start_idx:end]
+    sliced_primes = PRIMES[start_idx:count]
 
-    return sliced_primes if count is None else itertools.islice(sliced_primes, count)
+    return sliced_primes if end is None else itertools.takewhile(lambda p: p < end, sliced_primes)
 
 
 def prime_factors(num) -> list:

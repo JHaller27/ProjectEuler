@@ -1,3 +1,5 @@
 #!/bin/bash
 
-cp "template.py" "p$1.py"
+fname="p$1.py"
+cp "template.py" $fname
+code $fname

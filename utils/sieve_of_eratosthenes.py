@@ -1,4 +1,8 @@
+from typing import Iterator
+
 sieve = [False, False, True, True]
+
+
 def is_prime(num) -> bool:
     if num < len(sieve):
         if 0 <= num:
@@ -18,7 +22,7 @@ def is_prime(num) -> bool:
     return sieve[num]
 
 
-def primes(start: int = 2, end: int = None, count: int = None) -> int:
+def primes(start: int = 2, end: int = None, count: int = None) -> Iterator[int]:
     yielded = 0
     while (end is None or start < end) and (count is None or yielded < count):
         if is_prime(start):

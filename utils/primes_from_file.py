@@ -14,8 +14,11 @@ def is_prime(num) -> bool:
     return num in PRIMES_SET
 
 
-def primes() -> Iterator[int]:
-    return iter(PRIMES)
+def primes(end: int = None) -> Iterator[int]:
+    if end is None:
+        return iter(PRIMES)
+    else:
+        return itertools.islice(iter(PRIMES), end)
 
 
 def prime_factors(num) -> list:
@@ -23,7 +26,7 @@ def prime_factors(num) -> list:
 
     tmp = num
     factor_list = [1]
-    for p in primes(end=num**.5+1):
+    for p in primes(end=int(num**.5+1)):
         while tmp % p == 0:
             factor_list.append(p)
             tmp //= p

@@ -1,3 +1,6 @@
+from functools import cache
+
+
 class _Decorator:
     def __init__(self):
         self._func = None
@@ -97,19 +100,9 @@ def track():
 
 
 class memoize(_DecoratorDecorator):
-    def __init__(self, base: _Decorator = None):
-        super().__init__(base)
-        self.cache = {}
-
+    @cache
     def _call(self, *args, **kwargs):
-        key = (tuple(args), tuple(sorted(kwargs.items())))
-        if key in self.cache:
-            return self.cache[key]
-
-        result = super()._call(*args, **kwargs)
-        self.cache[key] = result
-
-        return result
+        return super()._call(*args, **kwargs)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-import eulerlib as utils
+import utils.eulerlib as utils
 
 
 limit = 10**6-1

@@ -88,6 +88,13 @@ def prime_generator(limit):
                     isprime[j] = 0
 
 
+def prime_factor_generator(nr):
+    for i in prime_generator(nr):
+        while (nr % i) == 0:
+            yield i
+            nr /= i
+
+
 def list_smallest_prime_factors(n):
     result = [None] * (n + 1)
     limit = sqrt(n)
